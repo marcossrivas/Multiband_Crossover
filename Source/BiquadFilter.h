@@ -1,28 +1,15 @@
 #pragma once
+
 #include <JuceHeader.h>
 #include <cmath>
 
-
-
 class BiquadFilter
-
 {
-public:
-	BiquadFilter();
-
-	~BiquadFilter();
-
-	void samplerate(double samplerate);
-	void processBiquadLP(float* InAudio, float* OutAudio, float samplestoRender, double fs, float f1, float gain);
-	void processBiquadBP(float* InAudio, float* OutAudio, float samplestoRender, double fs, float f1, float f2, float gain);
-	void processBiquadHP(float* InAudio, float* OutAudio, float samplestoRender, double fs, float f2, float gain);
-
-
 private:
 
-	//biquad coefficients 
+	//-- Coefficients --//
 
-	//lp
+	// LPF
 	float b0;
 	float b1;
 	float b2;
@@ -30,7 +17,7 @@ private:
 	float a1;
 	float a2;
 
-	//hp
+	// HPF
 
 	float _b0;
 	float _b1;
@@ -39,7 +26,7 @@ private:
 	float _a2;
 	float _a0;
 
-	//aux calculus
+	//-- Aux. variables --//
 
 	float wo;
 	float coswo;
@@ -53,12 +40,7 @@ private:
 	float sinwoh;
 	float alphah;
 
-
-	//parameters
-
-
-
-	//aux variables (circular buffer) for each filter
+	//-- Buffers --//
 
 	float x2{ 0.0 };
 	float x1{ 0.0 };
@@ -88,8 +70,16 @@ private:
 	float _y1{ 0.0 };
 	float _y0{ 0.0 };
 
-
 	float sampleRate;
 
+public:
 
+	BiquadFilter();
+
+	void samplerate(double samplerate);
+	void processBiquadLP(float* InAudio, float* OutAudio, float samplestoRender, double fs, float f1, float gain);
+	void processBiquadBP(float* InAudio, float* OutAudio, float samplestoRender, double fs, float f1, float f2, float gain);
+	void processBiquadHP(float* InAudio, float* OutAudio, float samplestoRender, double fs, float f2, float gain);
+
+	~BiquadFilter();
 };

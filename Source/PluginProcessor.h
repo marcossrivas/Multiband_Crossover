@@ -59,7 +59,6 @@ public:
     void getStateInformation (juce::MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
-
     juce::AudioProcessorValueTreeState parameters;
     juce::AudioProcessorValueTreeState::ParameterLayout initializeGUI();
 
@@ -67,7 +66,6 @@ private:
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MultibandCrossoverAudioProcessor)
 
-        
     std::unique_ptr<BiquadFilter> ptrBiquad1[2];
     std::unique_ptr<BiquadFilter> ptrBiquad2[2];
     std::unique_ptr<BiquadFilter> ptrBiquad3[2];

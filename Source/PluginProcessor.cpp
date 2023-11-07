@@ -22,19 +22,15 @@ MultibandCrossoverAudioProcessor::MultibandCrossoverAudioProcessor()
                        ), parameters(*this, nullptr, "PARAMETERS", initializeGUI())
 #endif
 {
-
     initializeDSP();
-
 }
 
 MultibandCrossoverAudioProcessor::~MultibandCrossoverAudioProcessor()
-{
-}
+{}
 
 juce::AudioProcessorValueTreeState::ParameterLayout MultibandCrossoverAudioProcessor::initializeGUI()
 {
     std::vector<std::unique_ptr<juce::RangedAudioParameter>> params;
-
 
     params.push_back(std::make_unique<juce::AudioParameterFloat>("BAND1_gain_ID", "Band1_gain", 0, 1, 1));
 
@@ -46,11 +42,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout MultibandCrossoverAudioProce
 
     params.push_back(std::make_unique<juce::AudioParameterFloat>("f2", "f2", 20, 20000, 3000));
 
-
-
     return{ params.begin() , params.end() };
-
-
 }
 
 void MultibandCrossoverAudioProcessor::initializeDSP()
@@ -169,11 +161,10 @@ void MultibandCrossoverAudioProcessor::processBlock (juce::AudioBuffer<float>& b
     auto totalNumInputChannels = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
 
-
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear(i, 0, buffer.getNumSamples());
 
-    //create a new buffer for each filter
+    //Create a new buffer for each filter.
 
     juce::AudioBuffer<float> band1Buffer(totalNumInputChannels, buffer.getNumSamples());
     juce::AudioBuffer<float> band2Buffer(totalNumInputChannels, buffer.getNumSamples());
@@ -182,22 +173,21 @@ void MultibandCrossoverAudioProcessor::processBlock (juce::AudioBuffer<float>& b
     band2Buffer.clear();
     band3Buffer.clear();
 
-
     for (int channel = 0; channel < totalNumInputChannels; ++channel)
     {
         auto* channelData = buffer.getWritePointer(channel);
 
-        //band 1 
+        //-- Band 1 --// 
         ptrBiquad1[channel]->processBiquadLP(channelData, band1Buffer.getWritePointer(channel), buffer.getNumSamples(), getSampleRate(), *parameters.getRawParameterValue("f1"), *parameters.getRawParameterValue("BAND1_gain_ID"));
 
-        //band 2 
+        //-- Band 2 --//  
         ptrBiquad2[channel]->processBiquadBP(channelData, band2Buffer.getWritePointer(channel), buffer.getNumSamples(), getSampleRate(), *parameters.getRawParameterValue("f1"), *parameters.getRawParameterValue("f2"), *parameters.getRawParameterValue("BAND2_gain_ID"));
 
-        //band 3 
+        //-- Band 3 --// 
         ptrBiquad3[channel]->processBiquadHP(channelData, band3Buffer.getWritePointer(channel), buffer.getNumSamples(), getSampleRate(), *parameters.getRawParameterValue("f2"), *parameters.getRawParameterValue("BAND3_gain_ID"));
     }
 
-    // sum of three filters
+    // Sum of three filters.
 
     for (int channel = 0; channel < totalNumInputChannels; ++channel)
     {

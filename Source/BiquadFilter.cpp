@@ -1,6 +1,5 @@
 #include "BiquadFilter.h"
 
-
 BiquadFilter::BiquadFilter()
 {}
 
@@ -12,20 +11,12 @@ void BiquadFilter::samplerate(double samplerate)
 	sampleRate = samplerate;
 }
 
-// 2 Biquad Band pass filter ( hp + lp , -6dB at fo ) for Linkwitz-Riley response.
+// --[Linkwitz-Riley Filter]-- //
 
-
-void BiquadFilter::processBiquadBP(float* InAudio, float* OutAudio, float samplestoRender, double fs, float f1, float f2, float gain) //total 4 filters 
+void BiquadFilter::processBiquadBP(float* InAudio, float* OutAudio, float samplestoRender, double fs, float f1, float f2, float gain) 
 {
-
-	// Cascade Butterworth 
-
 	for (int i = 0; i < samplestoRender; i++)
-
-
 	{
-		//math coef.
-
 		wo = 2 * pi * (f2 / fs);
 		coswo = std::cos(wo);
 		sinwo = std::sin(wo);
@@ -36,7 +27,7 @@ void BiquadFilter::processBiquadBP(float* InAudio, float* OutAudio, float sample
 		sinwoh = std::sin(woh);
 		alphah = sinwoh / (2 * Q);
 
-		// Low Pass coef
+		// Low Pass coefficients.
 		a0 = 1 + alpha;
 		b0 = ((1 - coswo) / 2) / a0;
 		b1 = (1 - coswo) / a0;
@@ -44,7 +35,7 @@ void BiquadFilter::processBiquadBP(float* InAudio, float* OutAudio, float sample
 		a1 = (-2 * coswo) / a0;
 		a2 = (1 - alpha) / a0;
 
-		// High Pass
+		// High Pass coefficients.
 		_a0 = 1 + alphah;
 		_b0 = ((1 + coswoh) / 2) / _a0;
 		_b1 = (-1 - coswoh) / _a0;
@@ -52,11 +43,9 @@ void BiquadFilter::processBiquadBP(float* InAudio, float* OutAudio, float sample
 		_a1 = (-2 * coswoh) / _a0;
 		_a2 = (1 - alphah) / _a0;
 
+		// CASCADE LOW PASS FILTERS
 
-		// LOW PASS
-
-
-		//	First 2nd order Butterworth
+		// 2nd order Butterworth [IIR - Biquad - Direct Form I]
 
 		x0 = InAudio[i];
 
@@ -68,7 +57,7 @@ void BiquadFilter::processBiquadBP(float* InAudio, float* OutAudio, float sample
 		y2 = y1;
 		y1 = y0;
 
-		//	Second 2nd order Butterworth 
+		// 2nd order Butterworth [IIR - Biquad - Direct Form I]
 
 		x0_ = y0;
 
@@ -80,12 +69,11 @@ void BiquadFilter::processBiquadBP(float* InAudio, float* OutAudio, float sample
 		y2_ = y1_;
 		y1_ = y0_;
 
-		////////////////////////////////////////////
+		//--------------------------------------------------//
 
-		//HIGH PASS
+		// CASCADE HIGH PASS FILTERS
 
-
-		//	First 2nd order Butterworth
+		// 2nd order Butterworth [IIR - Biquad - Direct Form I]
 
 		_x0 = y0_;
 
@@ -97,7 +85,7 @@ void BiquadFilter::processBiquadBP(float* InAudio, float* OutAudio, float sample
 		_y2 = _y1;
 		_y1 = _y0;
 
-		//	Second 2nd order Butterworth 
+		// Second 2nd order Butterworth [IIR - Biquad - Direct Form I] 
 
 		_x0_ = _y0;
 
@@ -109,31 +97,21 @@ void BiquadFilter::processBiquadBP(float* InAudio, float* OutAudio, float sample
 		_y2_ = _y1_;
 		_y1_ = _y0_;
 
+		// Output
 		OutAudio[i] = gain * _y0_;
 	}
-
-
 }
-
 
 void BiquadFilter::processBiquadLP(float* InAudio, float* OutAudio, float samplestoRender, double fs, float f1, float gain) //total 4 filters 
 {
-
-	// Cascade Butterworth 
-
 	for (int i = 0; i < samplestoRender; i++)
-
-
 	{
-		//math coef.
-
 		wo = 2 * pi * (f1 / fs);
 		coswo = std::cos(wo);
 		sinwo = std::sin(wo);
 		alpha = sinwo / (2 * Q);
 
-
-		// Low Pass coef
+		// Low Pass coefficients.
 		a0 = 1 + alpha;
 		b0 = ((1 - coswo) / 2) / a0;
 		b1 = (1 - coswo) / a0;
@@ -141,10 +119,9 @@ void BiquadFilter::processBiquadLP(float* InAudio, float* OutAudio, float sample
 		a1 = (-2 * coswo) / a0;
 		a2 = (1 - alpha) / a0;
 
-
 		// LOW PASS
 
-		//	First 2nd order Butterworth
+		// 2nd order Butterwort [IIR - Biquad - Direct Form I]
 
 		x0 = InAudio[i];
 
@@ -156,7 +133,7 @@ void BiquadFilter::processBiquadLP(float* InAudio, float* OutAudio, float sample
 		y2 = y1;
 		y1 = y0;
 
-		//	Second 2nd order Butterworth 
+		// 2nd order Butterworth [IIR - Biquad - Direct Form I]
 
 		x0_ = y0;
 
@@ -168,30 +145,21 @@ void BiquadFilter::processBiquadLP(float* InAudio, float* OutAudio, float sample
 		y2_ = y1_;
 		y1_ = y0_;
 
+		//Output
 		OutAudio[i] = gain * y0_;
 	}
-
-
 }
 
 void BiquadFilter::processBiquadHP(float* InAudio, float* OutAudio, float samplestoRender, double fs, float f2, float gain) //total 4 filters 
 {
-
-	// Cascade Butterworth 
-
 	for (int i = 0; i < samplestoRender; i++)
-
-
 	{
-		//math coef.
-
 		woh = 2 * pi * (f2 / fs);
 		coswoh = std::cos(woh);
 		sinwoh = std::sin(woh);
 		alphah = sinwoh / (2 * Q);
 
-
-		// High Pass
+		// High Pass coefficients.
 		_a0 = 1 + alphah;
 		_b0 = ((1 + coswoh) / 2) / _a0;
 		_b1 = (-1 - coswoh) / _a0;
@@ -199,10 +167,9 @@ void BiquadFilter::processBiquadHP(float* InAudio, float* OutAudio, float sample
 		_a1 = (-2 * coswoh) / _a0;
 		_a2 = (1 - alphah) / _a0;
 
-		//HIGH PASS
+		// HIGH PASS
 
-
-		//	First 2nd order Butterworth
+		// 2nd order Butterworth [IIR - Biquad - Direct Form I]
 
 		_x0 = InAudio[i];
 
@@ -214,7 +181,7 @@ void BiquadFilter::processBiquadHP(float* InAudio, float* OutAudio, float sample
 		_y2 = _y1;
 		_y1 = _y0;
 
-		//	Second 2nd order Butterworth 
+		// 2nd order Butterworth [IIR - Biquad - Direct Form I]
 
 		_x0_ = _y0;
 
@@ -226,8 +193,7 @@ void BiquadFilter::processBiquadHP(float* InAudio, float* OutAudio, float sample
 		_y2_ = _y1_;
 		_y1_ = _y0_;
 
+		// Output
 		OutAudio[i] = gain * _y0_;
 	}
-
-
 }
