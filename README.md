@@ -1,2 +1,4 @@
 # Multiband_Crossover
-  Linkwitz–Riley filters in C++ JUCE for multi-band processing
+  Linkwitz–Riley filters in C++ JUCE for multi-band processing. 
+
+  
